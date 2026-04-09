@@ -1,47 +1,27 @@
-const http = require('http');
-const fs = require('fs');
+const express = require('express');
+const app = express();
 
-const server = http.createServer((req, res) => {
-    // console.log(req);
-    console.log(req.url);
+app.listen(3000);
 
-    // set header content type
-    res.setHeader('Content-Type', 'text/html');
+app.get('/', (req, res) => {
+    res.sendFile('./views/index.html', {root: __dirname})
+})
 
-    // routing
-    let path = './views/';
-    switch (req.url) {
-        case '/':
-            path += 'index.html';
-            res.statusCode = 200;
-            break;
-        case '/about':
-            path += 'about.html';
-            res.statusCode = 200;
-            break;
-        case '/contact-me':
-            path += 'contact-me.html';
-            res.statusCode = 200;
-            break;
-        default:
-            path += '404.html';
-            res.statusCode = 404;
-    }
-
-    // send html
-    fs.readFile(path, (err, data) => {
-        if (err) {
-            console.log(err);
-            res.end();
-        }
-        //res.write(data);
-        res.end(data);
-    });
+app.get('/about', (req, res) => {
+    res.sendFile('./views/about.html', {root: __dirname})
+})
 
 
-});
+app.get('/contact-me', (req, res) => {
+    res.sendFile('./views/contact-me.html', {root: __dirname})
+})
 
-// localhost is the default value for 2nd argument
-server.listen(3000, 'localhost', () => {
-    console.log('listening for requests on port 3000');
-});
+// redirects
+app.get('/contact', (req, res) => {
+    res.redirect('/contact-me');
+})
+
+// 404 page
+app.use((req, res) => {
+    res.status(404).sendFile('./views/404.html', {root: __dirname})
+})
